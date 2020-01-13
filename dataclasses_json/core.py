@@ -232,8 +232,11 @@ def _decode_generic(type_, value, infer_missing):
         # otherwise fallback on constructing using type_ itself
         try:
             res = _get_type_cons(type_)(xs)
-        except (TypeError, AttributeError):
-            res = type_(xs)
+        except (TypeError, AttributeError) as error:
+            try:
+                res = type_(xs)
+            except Exception as new_error:
+                raise new_error from error
     else:  # Optional or Union
         if _is_optional(type_) and len(type_.__args__) == 2:  # Optional
             type_arg = type_.__args__[0]
